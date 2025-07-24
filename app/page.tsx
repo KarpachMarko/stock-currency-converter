@@ -1,103 +1,161 @@
-import Image from "next/image";
+"use client"
+
+import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import DefaultLayout from "@/components/default-content-layout"
+import {
+  ChartConfig,
+  ChartContainer,
+  ChartLegend,
+  ChartLegendContent,
+  ChartTooltip,
+  ChartTooltipContent
+} from "@/components/ui/chart"
+import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts"
+import { useQuery } from "@tanstack/react-query"
+import { SkeletonAreaChart } from "@/components/ui/skeleton-area-chart"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+
+type ChartData = {
+  date: string;
+  closeUSD: number;
+  usdEurRate: number;
+  closeEUR: number;
+}
+
+async function fetchChartData(): Promise<ChartData[]> {
+  const res = await fetch("/api/chart-data")
+  if (!res.ok) {
+    throw new Error("Failed to fetch chart data")
+  }
+  const data = await res.json()
+  return data.map((item: any) => ({
+    ...item,
+    date: new Date(item.date).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+  }))
+}
 
 export default function Home() {
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <DefaultLayout>
+      <CompareStockCurrencyPrice/>
+    </DefaultLayout>
+  )
+}
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+function CompareStockCurrencyPrice() {
+  const { data: chartData, isLoading, isError, error } = useQuery<ChartData[], Error>({
+    queryKey: ["chartData"],
+    queryFn: fetchChartData,
+  })
+
+  const chartConfig = {
+    closeUSD: {
+      label: "USD",
+      color: "var(--chart-1)",
+    },
+    closeEUR: {
+      label: "EUR",
+      color: "var(--chart-2)",
+    },
+  } satisfies ChartConfig
+
+  if (isLoading) {
+    return (
+      <Card>
+        <CardContent>
+          <SkeletonAreaChart className={"min-h-[400px]"}/>
+        </CardContent>
+      </Card>
+    )
+  }
+
+  if (isError) {
+    return (
+      <Alert variant={"destructive"} className={"w-max"}>
+        <AlertTitle>
+          <p>Error loading chart data</p>
+        </AlertTitle>
+        {error != null ? <AlertDescription>
+          <p>{error?.message}</p>
+        </AlertDescription> : <></>}
+      </Alert>
+    )
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <div><strong>IBKR</strong> - USD/EUR</div>
+      </CardHeader>
+      <CardContent>
+        <ChartContainer className={"min-h-[400px]"} config={chartConfig}>
+          <AreaChart
+            accessibilityLayer
+            data={chartData}
+            margin={{
+              left: -20,
+            }}
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+            <CartesianGrid vertical={false}/>
+            <XAxis
+              dataKey="date"
+              tickLine={false}
+              axisLine={false}
+              tickMargin={8}
             />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
-  );
+            <YAxis
+              type="number"
+              axisLine={true}
+              tickMargin={10}
+              domain={[0, "auto"]}
+            />
+            <ChartTooltip cursor={false} content={<ChartTooltipContent/>}/>
+            <defs>
+              <linearGradient id="closeUSD" x1="0" y1="0" x2="0" y2="1">
+                <stop
+                  offset="5%"
+                  stopColor="var(--color-closeUSD)"
+                  stopOpacity={0.8}
+                />
+                <stop
+                  offset="95%"
+                  stopColor="var(--color-closeUSD)"
+                  stopOpacity={0.1}
+                />
+              </linearGradient>
+              <linearGradient id="closeEUR" x1="0" y1="0" x2="0" y2="1">
+                <stop
+                  offset="5%"
+                  stopColor="var(--color-closeEUR)"
+                  stopOpacity={0.8}
+                />
+                <stop
+                  offset="95%"
+                  stopColor="var(--color-closeEUR)"
+                  stopOpacity={0.1}
+                />
+              </linearGradient>
+            </defs>
+            <Area
+              dataKey="closeUSD"
+              type="natural"
+              fill="url(#closeUSD)"
+              fillOpacity={0.4}
+              stroke="var(--color-closeUSD)"
+              stackId="a"
+            />
+            <Area
+              dataKey="closeEUR"
+              type="natural"
+              fill="url(#closeEUR)"
+              fillOpacity={0.4}
+              stroke="var(--color-closeEUR)"
+              stackId="b"
+            />
+            <ChartLegend content={<ChartLegendContent/>}/>
+          </AreaChart>
+        </ChartContainer>
+      </CardContent>
+    </Card>
+  )
 }
