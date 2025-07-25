@@ -3,15 +3,23 @@ import { Area, AreaChart, CartesianGrid } from "recharts"
 import { useEffect, useState } from "react"
 import { cn } from "@/lib/utils"
 
-export function SkeletonAreaChart({ className }: { className?: string }) {
+export function SkeletonAreaChart({
+  className,
+}: {
+  className?: string
+}) {
+  const min = 10
+  const max = 50
+
   function getRandomValues() {
-    return Array.from({ length: 5 }, () => ({ val: Math.random() }))
+    return Array.from({ length: 5 }, () => ({ val: Math.random() * (max - min) + min }))
   }
 
   const [chartData, setChartData] = useState(getRandomValues)
   useEffect(() => {
-    setInterval(() => setChartData(getRandomValues), 2000)
-  }, [])
+    const interval = setInterval(() => setChartData(getRandomValues), 2000)
+    return () => clearInterval(interval)
+  }, [min, max])
 
   const chartConfig = {
     val: {

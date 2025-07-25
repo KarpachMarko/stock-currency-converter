@@ -1,21 +1,38 @@
 # Stock Chart Currency Converter
 
-This Next.js application fetches stock data and converts its price to EUR for comparison. It utilizes a Next.js API endpoint to retrieve financial data and displays it using a chart on the frontend.
+This Next.js application fetches stock data and converts its price to a selected target currency for comparison. It
+utilizes Next.js API endpoints to retrieve financial data from the `yahoo-finance2` library and displays it using a
+Recharts chart on the frontend.
 
 ## Key Features:
 
-- **Stock Data Fetching**: Fetches historical stock data for a given ticker (default: IBKR).
-- **Currency Conversion**: Retrieves historical USD to EUR exchange rates and converts stock prices to EUR.
-- **Next.js API Endpoint**: A backend API route (`/api/chart-data`) handles data fetching and processing using `yahoo-finance2`.
-- **Frontend Chart Display**: Displays a chart comparing stock prices in USD and EUR using Recharts.
-- **Data Management**: Uses TanStack Query for efficient data fetching, caching, and state management on the client-side.
+- **Stock Data Fetching**: Fetches historical stock data for a given ticker.
+- **Currency Conversion**: Retrieves historical exchange rates and converts stock prices to a target currency.
+- **Stock and Currency Search**: Provides API endpoints to search for stock tickers and currencies.
+- **Interactive UI**: Features date range selectors and an interactive chart to visualize the data.
+- **Data Management**: Uses TanStack Query for efficient data fetching, caching, and state management.
+
+## Project Structure
+
+- **`api/finance-api.ts`**: Contains client-side functions for making requests to the application's backend API
+  endpoints.
+- **`types/`**: Directory for shared type definitions used across the application.
+- **`containers/home-page/currency-converter-chart/index.tsx`**: The main React component that renders the chart and
+  user interface.
+
+## API Endpoints
+
+- **`/api/chart-data`**: Fetches historical data for a specified stock ticker and converts it to a target currency.
+    - **Params**: `ticker`, `target-currency`, `startDate`, `endDate`
+- **`/api/search-stock`**: Searches for stock tickers based on a query.
+    - **Params**: `query`
+- **`/api/search-currency`**: Searches for currencies based on a query.
+    - **Params**: `query`
 
 ## How it Works:
 
-1.  The frontend (`app/page.tsx`) uses TanStack Query to call the `/api/chart-data` endpoint.
-2.  The `/api/chart-data` endpoint (`app/api/chart-data/route.ts`) uses `yahoo-finance2` to fetch:
-    -   Historical stock data for the specified ticker.
-    -   Historical USD to EUR exchange rates.
-3.  The API processes the fetched data, aligning stock prices with the corresponding exchange rates and handling missing values by forward-filling and back-filling.
-4.  The processed data (stock prices in both USD and EUR) is returned to the frontend.
-5.  The frontend then renders an area chart displaying the comparative stock prices over time.
+1. The frontend (`CurrencyConverter` component) uses functions from `api/finance-api.ts` to fetch data.
+2. These functions call the Next.js API endpoints (e.g., `/api/chart-data`).
+3. The API routes in `app/api/` use the `yahoo-finance2` library to fetch the requested financial data.
+4. The processed data is returned to the frontend.
+5. The frontend renders the data in an interactive chart and allows the user to modify the inputs.
