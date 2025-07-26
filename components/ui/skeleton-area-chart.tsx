@@ -28,7 +28,7 @@ export function SkeletonAreaChart({
   } satisfies ChartConfig
 
   return (
-    <ChartContainer className={cn("min-h-[200px] animate-pulse", className)} config={chartConfig}>
+    <ChartContainer className={cn("min-h-[100px] animate-pulse", className)} config={chartConfig}>
       <AreaChart
         accessibilityLayer
         data={chartData}

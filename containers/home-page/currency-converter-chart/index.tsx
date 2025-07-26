@@ -94,7 +94,7 @@ export function CurrencyConverter({ ticker, targetCurrency }: { ticker: string, 
     <Card>
       <CardContent>
         <div className={"flex flex-col gap-5 mb-5"}>
-          <div className={"flex justify-between gap-10"}>
+          <div className={"flex flex-wrap justify-between space-x-10 space-y-5"}>
             <div className={"flex items-center gap-2"}>
               <strong className={"text-lg"}>{ticker}</strong>
               <span>-</span>
@@ -105,13 +105,12 @@ export function CurrencyConverter({ ticker, targetCurrency }: { ticker: string, 
               </span>
             </div>
 
-            <div className={"flex items-center gap-2"}>
-              <DatePickerWithInput className={"w-[180px]"} date={rangeStartDate} setDate={date => {
+            <div className={"flex flex-wrap items-center gap-2"}>
+              <DatePickerWithInput label={"From"} className={"w-[180px]"} date={rangeStartDate} setDate={date => {
                 setRangeStartDate(date)
                 setSelectedRange(null)
               }}/>
-              <div>-</div>
-              <DatePickerWithInput className={"w-[180px]"} date={rangeEndDate} setDate={date => {
+              <DatePickerWithInput label={"To"} className={"w-[180px]"} date={rangeEndDate} setDate={date => {
                 setRangeEndDate(date)
                 setSelectedRange(null)
               }}/>
@@ -158,7 +157,7 @@ function CurrencyConverterChart({ queryResponse: { data, isLoading, isError, err
 
   if (isLoading) {
     return (
-      <SkeletonAreaChart className={"min-h-[400px]"}/>
+      <SkeletonAreaChart className={"min-h-[100px]"}/>
     )
   }
 
@@ -176,7 +175,7 @@ function CurrencyConverterChart({ queryResponse: { data, isLoading, isError, err
   }
 
   return (
-    <ChartContainer className={"min-h-[400px]"} config={chartConfig}>
+    <ChartContainer className={"min-h-[100px]"} config={chartConfig}>
       <AreaChart
         accessibilityLayer
         data={data?.data}

@@ -73,16 +73,16 @@ function HomeContent() {
 
   return (
     <div className={"flex flex-col gap-2"}>
-      <div className={"flex gap-5"}>
+      <div className={"flex flex-wrap gap-5"}>
         <Search
-          className={"flex-1"}
+          className={"flex-1 min-w-[150px]"}
           fetchItems={searchStocks}
           placeholder={"Search ticker"}
           onSelect={res => res && setTicker(res.value)}
           label={"Ticker"}
         />
         <Search
-          className={"flex-1"}
+          className={"flex-1 min-w-[150px]"}
           fetchItems={searchCurrency}
           placeholder={"Search currency"}
           onSelect={res => res && setTargetCurrency(res.value)}
