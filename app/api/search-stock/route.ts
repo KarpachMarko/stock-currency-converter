@@ -14,6 +14,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(result.quotes
       .filter(q => q.isYahooFinance)
+      .filter(q => q.quoteType === "EQUITY")
       .map(q => q.symbol))
   } catch (error) {
     console.error("Error searching for stock:", error)

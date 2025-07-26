@@ -13,11 +13,11 @@ export async function GET(req: NextRequest) {
 
     const searchQuery = `${baseCurrency}${query != null ? "/" + query : ""}`
     const result = await yahooFinance.search(searchQuery, { newsCount: 0, quotesCount: 6 })
-    console.log(searchQuery)
     const currencies = result.quotes
       .filter(q => q.isYahooFinance)
       .filter(q => q.longname?.toLocaleLowerCase()?.startsWith(baseCurrency.trim().toLocaleLowerCase()))
-      .map(res => res.symbol.split("=")[0])
+      .filter(q => q.quoteType === "CURRENCY")
+      .map(res => res.shortname?.split("/")[1] ?? res.symbol.split("=")[0])
 
     return NextResponse.json(currencies)
   } catch (error) {

@@ -12,11 +12,12 @@ import {
 } from "@/api/finance-api"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { SkeletonAreaChart } from "@/components/ui/skeleton-area-chart"
+import { useSearchParamsState } from "@/hooks/useSearchParamsState"
 
 export default function Home() {
-  const [ticker, setTicker] = useState<string>()
+  const [ticker, setTicker] = useSearchParamsState("ticker")
   const [baseCurrency, setBaseCurrency] = useState<string>()
-  const [targetCurrency, setTargetCurrency] = useState<string>()
+  const [targetCurrency, setTargetCurrency] = useSearchParamsState("target-currency")
 
   const queryClient = useQueryClient()
 
