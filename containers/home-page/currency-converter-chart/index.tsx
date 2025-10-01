@@ -13,10 +13,11 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts"
 import { DatePickerWithInput } from "@/components/ui/date-picker-with-input"
 import { Toggle } from "@/components/ui/toggle"
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { Skeleton } from "@/components/ui/skeleton"
 import { fetchChartData } from "@/api/finance-api"
 import { ChartDataResponse } from "@/types/chart-data"
+import { useSearchParamsState } from "@/hooks/useSearchParamsState"
 
 type DateRange = {
   start: Date
@@ -73,7 +74,13 @@ const rangeSelectors: RangeSelector[] = [
 ]
 
 export function CurrencyConverter({ ticker, targetCurrency }: { ticker: string, targetCurrency: string }) {
-  const [selectedRange, setSelectedRange] = useState<RangeSelector | null>(oneMonthRangeSelector)
+  const [range, setRange] = useSearchParamsState("range")
+  const selectedRange = useMemo(() => {
+    return rangeSelectors.find(r => r.label === range) ?? oneMonthRangeSelector
+  }, [range])
+  const setSelectedRange = useCallback((range: RangeSelector | undefined) => {
+    range && setRange(range.label)
+  }, [setRange])
   const [rangeStartDate, setRangeStartDate] = useState<Date>()
   const [rangeEndDate, setRangeEndDate] = useState<Date>()
 
@@ -108,11 +115,11 @@ export function CurrencyConverter({ ticker, targetCurrency }: { ticker: string, 
             <div className={"flex flex-wrap items-center gap-2"}>
               <DatePickerWithInput label={"From"} className={"w-[180px]"} date={rangeStartDate} setDate={date => {
                 setRangeStartDate(date)
-                setSelectedRange(null)
+                setSelectedRange(undefined)
               }}/>
               <DatePickerWithInput label={"To"} className={"w-[180px]"} date={rangeEndDate} setDate={date => {
                 setRangeEndDate(date)
-                setSelectedRange(null)
+                setSelectedRange(undefined)
               }}/>
             </div>
           </div>
@@ -126,7 +133,7 @@ export function CurrencyConverter({ ticker, targetCurrency }: { ticker: string, 
                   if (pressed) {
                     setSelectedRange(range)
                   } else {
-                    setSelectedRange(null)
+                    setSelectedRange(undefined)
                   }
                 }}>
                 <span className={"text-xs"}>{range.label}</span>
