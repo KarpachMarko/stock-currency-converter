@@ -98,7 +98,7 @@ export function CurrencyConverter({ ticker, targetCurrency }: { ticker: string, 
   }, [selectedRange])
 
   return (
-    <Card>
+    <Card className={"hover:shadow-lg hover:shadow-cyan-500/50"}>
       <CardContent>
         <div className={"flex flex-col gap-5 mb-5"}>
           <div className={"flex flex-wrap justify-between space-x-10 space-y-5"}>
