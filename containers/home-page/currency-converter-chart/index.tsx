@@ -1,4 +1,6 @@
-import { useQuery, UseQueryResult } from "@tanstack/react-query"
+import { fetchChartData } from "@/api/finance-api"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { Card, CardContent } from "@/components/ui/card"
 import {
   ChartConfig,
   ChartContainer,
@@ -7,17 +9,15 @@ import {
   ChartTooltip,
   ChartTooltipContent
 } from "@/components/ui/chart"
-import { Card, CardContent } from "@/components/ui/card"
-import { SkeletonAreaChart } from "@/components/ui/skeleton-area-chart"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts"
 import { DatePickerWithInput } from "@/components/ui/date-picker-with-input"
-import { Toggle } from "@/components/ui/toggle"
-import { useCallback, useEffect, useMemo, useState } from "react"
 import { Skeleton } from "@/components/ui/skeleton"
-import { fetchChartData } from "@/api/finance-api"
-import { ChartDataResponse } from "@/types/chart-data"
+import { SkeletonAreaChart } from "@/components/ui/skeleton-area-chart"
+import { Toggle } from "@/components/ui/toggle"
 import { useSearchParamsState } from "@/hooks/useSearchParamsState"
+import { ChartData, ChartDataResponse } from "@/types/chart-data"
+import { useQuery, UseQueryResult } from "@tanstack/react-query"
+import { useCallback, useEffect, useMemo, useState } from "react"
+import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts"
 
 type DateRange = {
   start: Date
@@ -88,6 +88,10 @@ export function CurrencyConverter({ ticker, targetCurrency }: { ticker: string, 
     queryKey: ["chartData", ticker, targetCurrency, rangeStartDate, rangeEndDate],
     queryFn: () => fetchChartData(ticker, targetCurrency, { start: rangeStartDate, end: rangeEndDate }),
   })
+  const currentPrice = useMemo<ChartData | undefined>(() => {
+    const chartData = queryResponse.data?.data ?? []
+    return chartData?.[chartData.length - 1]
+  }, [queryResponse.data])
 
   useEffect(() => {
     if (selectedRange) {
@@ -102,14 +106,21 @@ export function CurrencyConverter({ ticker, targetCurrency }: { ticker: string, 
       <CardContent>
         <div className={"flex flex-col gap-5 mb-5"}>
           <div className={"flex flex-wrap justify-between space-x-10 space-y-5"}>
-            <div className={"flex items-center gap-2"}>
-              <strong className={"text-lg"}>{ticker}</strong>
-              <span>-</span>
-              <span className={"flex items-center gap-0.5 text-sm"}>
+            <div className={"flex flex-col gap-2"}>
+              <div className={"flex items-center gap-2"}>
+                <strong className={"text-lg"}>{ticker}</strong>
+                <span>-</span>
+                <span className={"flex items-center gap-0.5 text-sm"}>
                 <span>{queryResponse.data?.baseCurrency ?? <Skeleton className={"inline-block h-3 w-8"}/>}</span>
                 <span>/</span>
                 <span>{targetCurrency}</span>
               </span>
+              </div>
+              {currentPrice && (
+                <div>
+                  {currentPrice?.baseCurrencyPrice.toFixed(2)} / {currentPrice?.targetCurrencyPrice.toFixed(2)}
+                </div>
+              )}
             </div>
 
             <div className={"flex flex-wrap items-center gap-2"}>
