@@ -87,6 +87,7 @@ export function CurrencyConverter({ ticker, targetCurrency }: { ticker: string, 
   const queryResponse = useQuery<ChartDataResponse, Error>({
     queryKey: ["chartData", ticker, targetCurrency, rangeStartDate, rangeEndDate],
     queryFn: () => fetchChartData(ticker, targetCurrency, { start: rangeStartDate, end: rangeEndDate }),
+    retry: false
   })
   const currentPrice = useMemo<ChartData | undefined>(() => {
     const chartData = queryResponse.data?.data ?? []

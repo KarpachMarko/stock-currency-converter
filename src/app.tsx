@@ -1,8 +1,6 @@
-"use client"
-
 import DefaultLayout from "@/components/default-content-layout"
 import { CurrencyConverter } from "@/containers/home-page/currency-converter-chart"
-import { Suspense, useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { Search } from "@/components/ui/search"
 import { useQueryClient } from "@tanstack/react-query"
 import {
@@ -13,14 +11,11 @@ import {
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { SkeletonAreaChart } from "@/components/ui/skeleton-area-chart"
 import { useSearchParamsState } from "@/hooks/useSearchParamsState"
-import { Skeleton } from "@/components/ui/skeleton"
 
-export default function Home() {
+export default function App() {
   return (
     <DefaultLayout>
-      <Suspense fallback={<HomeLoading/>}>
-        <HomeContent/>
-      </Suspense>
+      <HomeContent />
     </DefaultLayout>
   )
 }
@@ -34,7 +29,7 @@ function HomeContent() {
 
   const searchStocks = useCallback(async (query: string) => {
     const res = await queryClient.fetchQuery({
-      queryKey: ["search-stock"],
+      queryKey: ["search-stock", query],
       queryFn: () => searchStocksApi(query)
     })
     return res?.map((item) => ({ value: item, label: item })) ?? []
@@ -45,7 +40,7 @@ function HomeContent() {
       return []
     }
     const res = await queryClient.fetchQuery({
-      queryKey: ["search-currency"],
+      queryKey: ["search-currency", baseCurrency, query],
       queryFn: () => searchCurrenciesApi(query, baseCurrency)
     })
     return res?.map((item) => ({ value: item, label: item })) ?? []
@@ -58,14 +53,14 @@ function HomeContent() {
         setTargetCurrency(currency)
       }
     })
-  }, [queryClient, searchCurrency])
+  }, [searchCurrency, setTargetCurrency])
 
   useEffect(() => {
     if (!ticker) {
       return
     }
     queryClient.fetchQuery({
-      queryKey: ["fetch-base-currency"],
+      queryKey: ["fetch-base-currency", ticker],
       queryFn: () => fetchTickerBaseCurrency(ticker)
     })
       .then(setBaseCurrency)
@@ -100,22 +95,6 @@ function HomeContent() {
           </AlertDescription>
         </Alert>
       }
-    </div>
-  )
-}
-
-function HomeLoading() {
-  return (
-    <div className={"flex flex-col gap-2"}>
-      <div className={"flex gap-5"}>
-        <Skeleton className={"flex-1 h-8"}/>
-        <Skeleton className={"flex-1 h-8"}/>
-      </div>
-      <Alert>
-        <AlertDescription className={"p-5"}>
-          <SkeletonAreaChart/>
-        </AlertDescription>
-      </Alert>
     </div>
   )
 }

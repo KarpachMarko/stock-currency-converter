@@ -1,36 +1,27 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Stock Chart Currency Converter
 
-## Getting Started
+React + Vite app for comparing a stock price in its base currency against a selected target currency.
 
-First, run the development server:
+Yahoo Finance requests are made by the local Node server through `/api/*` endpoints, so the browser does not call Yahoo directly.
+
+## Development
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open the Vite URL printed by the command, usually [http://localhost:5173](http://localhost:5173).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Build
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+pnpm build
+```
 
-## Learn More
+## Structure
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `src/main.tsx`: Vite React entry point.
+- `src/app.tsx`: Main app screen.
+- `api/finance-api.ts`: Browser-side wrapper for same-origin API requests.
+- `server.mjs`: Node server for Yahoo Finance requests, API routes, static assets, and in-memory upstream caching.
+- `containers/home-page/currency-converter-chart/index.tsx`: Chart and range controls.
